@@ -22,6 +22,7 @@
 static const struct option long_options[] = {
   {"help", no_argument, 0, 'h'},
   {"version", no_argument, 0, 'v'},
+
   {"from", required_argument, 0, 'f'},
   {"to", required_argument, 0, 't'},
 
@@ -110,7 +111,7 @@ int main(int argc, char **argv) {
           time_t &dest = c == 'f' ? from : to;
           dest = value;
         } else {
-          std::cout << "malformed value: " << optarg;
+          std::cout << "malformed value: " << optarg << "\n";
           return EXIT_FAILURE;
         }
       }
@@ -151,12 +152,13 @@ int main(int argc, char **argv) {
       break;
 
     default:
+      std::cerr << "invalid option: " << argv[optind - 1] << "\n";
       usage(argv[0]);
       return EXIT_FAILURE;
       break;
     }
   }
-  if (tokens_offs == 0) {
+  if (tokens_offs < 2) {
     std::cerr << "missing argument\n";
     return EXIT_FAILURE;
   }
@@ -204,7 +206,7 @@ int main(int argc, char **argv) {
     {
       // Emit sorted (revered) queue
       for(const auto element : parser.get_top_queries(top_queries)) {
-        std::cout << (std::string) element.first << "\t" << element.second << "\n";
+        std::cout << (std::string) element.first << " " << element.second << "\n";
       }
     }
     break;

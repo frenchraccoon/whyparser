@@ -10,17 +10,28 @@ The goal is to parse large request logs from ycombinator search backend, and ext
 
 ## Build
 
-You need:
-
-* gcc (C++11-aware)
-* make
-* groff
+* Environment
+   * Linux (tested with x86-64 platform)
+* Prerequisites
+   * gcc (C++11-aware) (tested with gcc 6.3.0)
+   * make
+   * valgrind (for tests)
+   * groff (for man page)
+* Building
+   * `make`
+      * you may have to remove `-Werror` in the Makefile with some gcc releases detecting incorrectly uninitialized pathes (GCC 7.x)
+* Testing
+   * `make tests`
+   * Examples
+      * `./hnStat distinct hn_logs.tsv`
+      * `./hnStat top 10 hn_logs.tsv`
+      * `./hnStat top 10 --from=1438480794 --to=1438508805 hn_logs.tsv`
 
 ## The assumptions made
 
 * Given a timeframe, all unique requests can be held in memory; the typical sample provided sees to infer that this is not an issue, even with a very large timeframe (eg. a year)
 * Query log file can be potentially huge, even if small time window are used afterwards for queries
-* The logs are not strictly sorted by timestamp; but seems to be *loosely* sorted (ie. time jitter seems never higher than 5 minutes). A possible explaination is that multiple backends were collected in a single file, with 5-minute slices (cron job-like), leading to local time discrepancies. A default optimization has been made to take advantage of this (seeking the desired timeframe minus 15 minutes) - this optimization can be either tuned (--jitter=seconds) or disabled entirely if desired (--fast-seek=no).
+* The logs are not strictly sorted by timestamp; but seems to be *loosely* sorted (ie. time jitter seems never higher than 5 minutes). A possible explaination is that multiple backends were collected in a single file, with 5-minute slices (cron job-like), leading to local time discrepancies. A default optimization has been made to take advantage of this (seeking the desired timeframe minus 15 minutes) - this optimization can be either tuned (`--jitter=seconds`) or disabled entirely if desired (`--fast-seek=no`).
 * Queries sems URL-encoded (RFC 3986); but no decoding is done as suggested in the example, assumming of the unicity of encoding (ie. not directly upstream client GET request but re-encoded queries)
 
 ## The overall design
@@ -54,44 +65,57 @@ A binary search is used to seek within the file, an unordered map to count the q
 
 ## The implementation files
 
-* [`main.cpp`](main.cpp) Parsing commandline arguments, calling parser to load and scan the file, output desired statistics
-* [`yprocessing.hpp`](yprocessing.hpp) [`yprocessing.cpp`](yprocessing.cpp) Specialization of mapped records parser to extract hacker news logs stats
-* [`yrequest.hpp`](yrequest.hpp) [`yrequest.cpp`](yrequest.cpp) Specialized record type to unserialize a hacker news log line
-* [`refstringmap.hpp`](refstringmap.hpp) Represent a string, with outer buffer pointing to an external const reference
-* [`records.hpp`](records.hpp) An abstract generic "record" reader on top of a mapped file
-* [`chrono.hpp`](chrono.hpp) Small helper class to measure elapsed time
-* [`mappedfile.hpp`](mappedfile.hpp) [`mappedfile.cpp`](mappedfile.cpp) Class aimed to handle memory mapping of a file (read-only)
+* C++ implementation
+   * [`main.cpp`](main.cpp) Parsing commandline arguments, calling parser to load and scan the file, output desired statistics
+   * [`yprocessing.hpp`](yprocessing.hpp) [`yprocessing.cpp`](yprocessing.cpp) Specialization of mapped records parser to extract hacker news logs stats
+   * [`yrequest.hpp`](yrequest.hpp) [`yrequest.cpp`](yrequest.cpp) Specialized record type to unserialize a hacker news log line
+   * [`refstringmap.hpp`](refstringmap.hpp) Represent a string, with outer buffer pointing to an external const reference
+   * [`records.hpp`](records.hpp) An abstract generic "record" reader on top of a mapped file
+   * [`chrono.hpp`](chrono.hpp) Small helper class to measure elapsed time
+   * [`mappedfile.hpp`](mappedfile.hpp) [`mappedfile.cpp`](mappedfile.cpp) Class aimed to handle memory mapping of a file (read-only)
+* Tests
+   * [`test-suite.sh`](test-suite.sh) The tests suite
+   * [`parser.py`](parser.py) Alternate Python implementation for tests
+* Documentation
+   * [`hnStat.1`](hnStat.1) Manpage source
+   * [`README.md`](README.md) This file
+   * [`LICENSE`](LICENSE) License file (BSD 2-Clause "Simplified" License)
 
 ## Tests
 
-* Validation of the exercice spirit was done with full range
-
-* Another very simple implementation was used to validate the program (parser.py) with different ranges, manually
+* Unit tests (automated tests)
+* Validation of the exercice spirit was done with full range (automated tests)
+* Various error cases and commandline validation (automated tests)
+* A basic alternate implementation in Python was used to validate the program (parser.py) against the big sample file (automated tests)
 
 Example:
-python parser.py top 10 hn_logs.tsv
 
-## Stress tests
+`python parser.py top 10 hn_logs.tsv`
 
-* running hnStat on /bin/bash or tar.gz file (binary files) does not cause erroneous (ie. crashes, etc.) behavior
+## Torture tests
 
-for f in /usr/lib/x86_64-linux-gnu/*.so; do hnStat top 10 "$f" >/dev/null; done
+* running hnStat on `/bin/bash` or tar.gz file (binary files) does not cause erroneous (ie. crashes, etc.) behavior
+
+`for f in /usr/lib/x86_64-linux-gnu/*.so; do hnStat top 10 "$f" >/dev/null; done`
+
+This torture test has been merged in automated tests.
 
 ## Leaks
 
-* valgrind executed on hnStat with various patterns without any worrying reports
+* `valgrind` executed in a basic tests (automated tests)
+* `valgrind` executed on hnStat with various patterns without any worrying reports
 
-## What might have been too much (ie. did take more time than envisioned, and increased overall complexity)
+## What might have been too much
 
-* The binary search to optimize --from might have been a bit overkill for the exercise
+*ie. did take more time than envisioned, and increased overall complexity*
+
+* The binary search to optimize `--from` might have been a bit overkill for the exercise
 * The zero-string hashmap (ie. using references to mapped read-only file data instead of `std::string` as hash map keys) was also probably too much
 * Genericity was probably not a strong requirement (especially for the templated MappedRecords), even if this helped splitting the code logic/layers
 
 ## What is missing (sorry)
 
-* Automated tests, using parser.py to automatically check ranges vs. hnStat version
-* Automated valgrind validation
 * gprof analysis
 * A bit more API doc sould have been written in real life, probably
 * A nice class diagram could have been a plus, too
-
+* More automated tests ?

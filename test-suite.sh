@@ -41,7 +41,7 @@ http%3A%2F%2Fwebboard.yenta4.com%2Ftopic%2F379035%3Fsort%3D1 3100
 EOF
 )"
 
-got="$(/var/tmp/bin/hnStat top 3 hn_logs.tsv | hash_string)"
+got="$(./hnStat top 3 hn_logs.tsv | hash_string)"
 
 [ "$got" == "$expected" ]
 ok "BASIC TEST"
@@ -78,8 +78,8 @@ EOF
 [ "$(./hnStat distinct --from 51 --to 61 test-sample 2>/dev/null)" == "4" ]
 
 [ "$(./hnStat top 1 test-sample 2>/dev/null)" == "two 5" ]
-[ "$(./hnStat top 2 test-sample 2>/dev/null | tail +2)" == "four 4" ]
-[ "$(./hnStat top 3 test-sample 2>/dev/null | tail +3)" == "three 3" ]
+[ "$(./hnStat top 2 test-sample 2>/dev/null | tail -n +2)" == "four 4" ]
+[ "$(./hnStat top 3 test-sample 2>/dev/null | tail -n +3)" == "three 3" ]
 
 ok "UNIT TEST"
 

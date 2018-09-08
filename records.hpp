@@ -147,6 +147,7 @@ protected:
       /* Compare middle element */
       size_t position = middle;
       get_record(record, position);
+
       /* After this record, position has been set to next record */
       const int cmp = compare(record);
 
@@ -237,7 +238,7 @@ protected:
 template <typename T>
 class RecordIterator: public std::iterator<std::input_iterator_tag, T> {
 public:
-  RecordIterator(const MappedRecords<T> &map, size_t offs): map(map), offset(offs), size(map.get_size()) {
+  RecordIterator(const MappedRecords<T> &map, size_t offs): map(map), current(offs), offset(offs), size(map.get_size()) {
     assert(offset <= size);
     if (offset != size) {
       // Tune for linear read
@@ -250,6 +251,7 @@ public:
 
   /** Standard iterator operator++. **/
   RecordIterator& operator++() {
+    current = offset;
     map.get_record(record, offset);
     return *this;
   }
@@ -257,7 +259,7 @@ public:
   /** Standard iterator operator!=. **/
   bool operator != (const RecordIterator<T> &other) const {
     return &map != &other.map
-      || offset != other.offset;
+      || current != other.current;
   }
 
   /** Standard iterator operator*. **/
@@ -270,6 +272,9 @@ protected:
   const MappedRecords<T> &map;
 
   // Current offset
+  size_t current;
+
+  // Next offset
   size_t offset;
 
   // Mapped size

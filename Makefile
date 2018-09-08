@@ -88,7 +88,7 @@ INSTALL_PROGRAM ?= $(INSTALL) -m755
 MKDIR ?= mkdir -p -m 755
 TAR ?= tar
 GROFF ?= groff
-BASH = bash -c
+BASH = bash
 VALGRIND ?= valgrind --quiet --track-origins=yes --leak-check=full
 
 PREFIX ?= /usr
@@ -98,11 +98,17 @@ htmldir ?= ${PREFIX}/share/hnStat/html
 pdfdir ?= ${PREFIX}/share/hnStat/pdf
 man1ext ?= 1
 
+.PHONY: default
+default: build man
+
+.PHONY: all
 all: build man tests cleanobjs
 
+.PHONY: clean
 clean: cleanobjs
 	rm -f *.so* *.dll hnStat hnStat.html hnStat.pdf
 
+.PHONY: cleanobjs
 cleanobjs:
 	rm -f *.o *.obj
 
@@ -112,24 +118,30 @@ cleanobjs:
 %.o: %.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
+.PHONY: build
 build: hnStat
-	
+
 hnStat: $(OBJ)
 	$(CC) -o $@ $^ $(CXXFLAGS) $(LDFLAGS) $(EXECFLAGS) $(LIBS)
 
-tests:
+.PHONY: tests
+tests: build
 	$(BASH) ./test-suite.sh
 
+.PHONY: valgrind
 valgrind: build
 	$(VALGRIND) --quiet --track-origins=yes --leak-check=full ./hnStat top 100 hn_logs.tsv >/dev/null
 
+.PHONY: man
 man:
 	$(GROFF) -man -Thtml hnStat.1 > hnStat.html
 	$(GROFF) -man -Tps hnStat.1 | ps2pdf - hnStat.pdf
 
+.PHONY: dist
 dist:
 	$(TAR) cfz hnStat_$(VERSION).orig.tar.gz *.c *.h *.sh *.1 *.txt Makefile
 
+.PHONY: install
 install: build man
 	$(MKDIR) $(DESTDIR)$(bindir)
 	$(MKDIR) $(DESTDIR)$(man1dir)

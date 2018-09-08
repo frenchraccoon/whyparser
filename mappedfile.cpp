@@ -63,7 +63,7 @@ void ReadOnlyMemoryMap::map(const char *filename) {
 }
 
 void ReadOnlyMemoryMap::unmap() {
-  if (data != NULL) {
+  if (data != NULL && data != MAP_FAILED) {
     if (munmap(data, size) != 0) {
       perror("unexpected munmap error");
       abort();
