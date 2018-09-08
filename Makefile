@@ -15,6 +15,7 @@ CXX ?= g++
 # for security reasons (-fstack-protector-strong), and most ones for code correctness reasons.
 # See also <https://wiki.debian.org/Hardening> for hardening hints
 # We also use -march=native, as this is for this exercise, and not meant for production use.
+# -Werror removed due to potentially unknown false positives (such as GCC 7.x related)
 COMMON_CFLAGS := \
 	-D_FORTIFY_SOURCE=2 \
 	-march=native \
@@ -28,7 +29,6 @@ COMMON_CFLAGS := \
 	-fvisibility=hidden \
 	-pthread \
 	-grecord-gcc-switches \
-	-Werror \
 	-Wall \
 	-Wextra \
 	-Wbool-compare \
