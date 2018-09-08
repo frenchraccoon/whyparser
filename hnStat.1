@@ -1,0 +1,52 @@
+.\" Process this file with
+.\" groff -man -Tascii hnStat.1
+.\"
+.TH hnStat 1 "Sept 2018" "hnStat"
+.SH NAME
+hnStat \- extract statistics within a ycombinator logs
+.SH SYNOPSIS
+.B hnStat (distinct | top nb_top_queries) [--from TIMESTAMP] [--to TIMESTAMP] [--fast-seek (yes|no)] [--jitter <time_s>] input_file
+
+.B 
+.SH DESCRIPTION
+.B hnStat
+this program extracts distinct queries count, or top queries within a ycombinator logs
+.SH EXAMPLES
+.TP
+.B hnStat top 10 --from 1438387423 --to 1438667531 hn_logs.tsv
+ will return the top 10 queries from timestamp 1438387423 (Sat Aug  1 02:03:43 CEST 2015) to timestamp 1438667531 (Tue Aug  4 07:52:11 CEST 2015)
+
+.SS Options details
+.IP \--from
+specify the start of the range (timestamp is in seconds since Epoch)
+.IP \--to
+specify the end of the range (timestamp is in seconds since Epoch)
+.IP \--fast-seek
+enable or disable fast-seek algorithm when using start range
+.IP \--jitter
+specify fast-seek jitter, in seconds (default value is 900; eg. 15 minutes)
+
+.SH DIAGNOSTICS
+Errors/Warnings are reported to the standard error output
+
+.SH BUGS
+Please reports bugs to
+.B <roche@httrack.com>.
+Include a complete, self-contained example that will allow the bug to be reproduced, and say which version of hnStat you are using. Do not forget to detail options used, OS version, and any other information you deem necessary.
+.SH COPYRIGHT
+Copyright (C) 2018 Xavier Roche
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+.SH AUTHOR
+Xavier Roche <roche@httrack.com>
+.SH "SEE ALSO"
+The 
+.B author's website
+.B http://www.httrack.com/
