@@ -124,8 +124,12 @@ build: hnStat
 hnStat: $(OBJ)
 	$(CC) -o $@ $^ $(CXXFLAGS) $(LDFLAGS) $(EXECFLAGS) $(LIBS)
 
+.PHONY: sample
+sample:
+	test -f hn_logs.tsv || tar xvf hn_logs.tsv.bz2
+
 .PHONY: tests
-tests: build
+tests: build sample
 	$(BASH) ./test-suite.sh
 
 .PHONY: valgrind
