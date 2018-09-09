@@ -90,6 +90,7 @@ TAR ?= tar
 GROFF ?= groff
 BASH = bash
 VALGRIND ?= valgrind --quiet --track-origins=yes --leak-check=full
+DOT ?= dot
 
 PREFIX ?= /usr
 bindir ?= ${PREFIX}/bin/
@@ -118,6 +119,9 @@ cleanobjs:
 %.o: %.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
+%.svg: %.dot
+	$(DOT) $< -Tsvg -o $@
+
 .PHONY: build
 build: hnStat
 
@@ -135,6 +139,9 @@ tests: build sample
 .PHONY: valgrind
 valgrind: build
 	$(VALGRIND) --quiet --track-origins=yes --leak-check=full ./hnStat top 100 hn_logs.tsv >/dev/null
+
+.PHONY: graph
+graph: classes.svg
 
 .PHONY: man
 man:

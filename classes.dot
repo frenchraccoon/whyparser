@@ -1,0 +1,55 @@
+// Classes diagram
+digraph {
+	subgraph cluster_generic_classe {
+		label=<<b>Generic Classes</b><br />>
+		style=filled;
+		color=lightgreen;
+
+		ChronoTimer[shape="oval",label=<<b>ChronoTimer</b><br /><i>Small helper class to measure elapsed time</i>>,style=filled];
+		RefString[shape="oval",label=<<b>RefString</b><br /><i>A reference string (a const char*, and a length)</i>>,style=filled];
+		ReadOnlyMemoryMap[shape="oval",label=<<b>ReadOnlyMemoryMap</b><br /><i>Read-Only mapping of a file in memory</i>>,style=filled];
+		RefStringUnorderedHashMap[shape="oval",label=<<b>RefStringUnorderedHashMap</b><br /><i>A reference string unordered map</i>>,style=filled];
+		RefStringPriorityQueue[shape="oval",label=<<b>RefStringPriorityQueue</b><br /><i>Priority queue of RefString with a count</i>>,style=filled];
+
+		RefStringUnorderedHashMap -> RefString[label="Uses", style="dashed"];
+		RefStringPriorityQueue -> RefString[label="Uses", style="dashed"];
+	}
+
+	subgraph cluster_generic_templates {
+		label=<<b>Generic Templates</b><br />>
+		style=filled;
+		color=lightblue;
+
+		MappedRecords[shape="oval",label=<<b>MappedRecords&lt;T&gt;</b><br /><i>Read-Only mapping of a set of records within a file in memory</i>>,style=filled];
+		MappedRecords -> ReadOnlyMemoryMap[label=Inherits];
+		MappedRecords -> RecordLocation[label="Produces",style="dashed"];
+		
+		RecordLocation[shape="oval",label=<<b>RecordLocation&lt;T&gt;</b><br /><i>Record location</i>>,style=filled];
+		RecordLocation -> RecordIterator[label="Produces",style="dashed"];
+
+		RecordIterator[shape="oval",label=<<b>RecordIterator&lt;T&gt;</b><br /><i>Records iterator</i>>,style=filled];
+		RecordIterator -> T[label="Produces",style="dashed"];
+
+		T[shape="diamond",label=<<b>T</b><br /><i>Generic Type, implements specific records API</i>>,style=filled];
+	}
+
+	subgraph cluster_hacker_news_classes {
+		label=<<b>Specialized Hacker News Logs Parser</b><br />>
+		style=filled;
+		color=lightyellow;
+
+		WhyRequest[shape="diamond",label=<T = <b>WhyRequest</b><br /><i>Specialized record type to unserialize a hacker news log line</i>>,style=filled];
+		WhyRequest -> RefString[label="Produces",style="dashed"];
+
+		YParser[shape="oval",label=<<b>YParser</b><br /><i>Specialization of mapped records parser to extract hacker news logs stats</i>>,style=filled];
+		YParser -> MappedRecords[label=Inherits];
+		YParser -> T[label=<<i>templated</i>>, style=dotted];
+		YParser -> WhyRequest[label=<<i>templated</i>>, style=dotted];
+		YParser -> RefStringUnorderedHashMap[label="Uses", style="dashed"];
+		YParser -> RefStringPriorityQueue[label="Uses", style="dashed"];
+		YParser -> ChronoTimer[label="Uses", style="dashed"];
+	}
+
+	main[shape="box", label=<<b>main</b><br /><i>main program</i>>];
+	main -> YParser[label="Uses", style="dashed"];
+}

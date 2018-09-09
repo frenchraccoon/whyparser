@@ -12,11 +12,12 @@ The goal is to parse large request logs from ycombinator search backend, and ext
 
 * Environment
    * Linux (tested with x86-64 platform)
-* Prerequisites
+* Prerequisites `apt-get install g++ make valgrind groff graphviz`
    * gcc (C++11-aware) (tested with gcc 6.3.0)
    * make
    * valgrind (for tests)
    * groff (for man page)
+   * graphviz (for svg graphs)
 * Building
    * `make`
       * you may have to remove `-Werror` in the Makefile with some gcc releases detecting incorrectly uninitialized pathes (GCC 7.x)
@@ -81,6 +82,12 @@ A binary search is used to seek within the file, an unordered map to count the q
    * [`README.md`](README.md) This file
    * [`LICENSE`](LICENSE) License file (BSD 2-Clause "Simplified" License)
 
+## Classes
+
+This is an attempt to describe the classes and their interactions.
+
+![Classes Diagram](classes.svg)
+
 ## Tests
 
 * Unit tests (automated tests)
@@ -117,5 +124,5 @@ This torture test has been merged in automated tests.
 
 * gprof analysis
 * A bit more API doc sould have been written in real life, probably
-* A nice class diagram could have been a plus, too
+* Classes diagram is a bit messy
 * More automated tests ?
